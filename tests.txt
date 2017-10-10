@@ -1,4 +1,5 @@
 $
 blah$blah
 <blah>$&lt;blah&gt;
-<u>test</u>$<u>test</u>
+notunderline<u>underline</u>notunderline2$notunderline<u>underline</u>notunderline2
+<u>underline</u>$<u>underline</u>

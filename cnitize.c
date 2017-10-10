@@ -28,15 +28,44 @@ int main(int argc, char const *argv[]) {
 
 void parse(const char * restrict src, char * restrict attrs) {
   size_t len = strlen(src);
+  char mask = 0;
 
   for (size_t i = 0; i < len; i++) {
-    attrs = 0;
+    if (!strncmp(src+i,"<u>",3)) {
+      attrs[i]   = A_TAG;
+      attrs[i+1] = A_TAG;
+      attrs[i+2] = A_TAG;
+      i+=2;
+      mask |= A_UNDERLINE;
+    }
+    else if (!strncmp(src+i,"</u>",3)) {
+      attrs[i]   = A_TAG;
+      attrs[i+1] = A_TAG;
+      attrs[i+2] = A_TAG;
+      attrs[i+3] = A_TAG;
+      i+=3;
+      mask &= ~A_UNDERLINE;
+    }
+    else {
+      attrs[i] = mask;
+    }
   }
 }
 
 void compact(char * restrict src, char * restrict attrs)
 {
-  // TODO IMPLEMENT
+  size_t inpos = 0, outpos = 0;
+  while(src[inpos] != 0) {
+    if (attrs[inpos] == A_TAG)
+      inpos++;
+    else {
+      attrs[outpos] = attrs[inpos];
+      src[outpos] = src[inpos];
+      inpos++;
+      outpos++;
+    }
+  }
+  src[outpos] = 0;
 }
 
 int tohtml(
@@ -45,7 +74,31 @@ int tohtml(
   char * restrict dst,
   size_t dstsize)
 {
-  *dst = 0;
+  size_t srcpos = 0, dstpos = 0;
+
+  while(dstpos < dstsize-1) { // TODO : check if off by one
+    if(
+      (srcpos == 0 && attrs[srcpos] == A_UNDERLINE) ||
+      (srcpos != 0 && attrs[srcpos] == A_UNDERLINE && attrs[srcpos-1] != A_UNDERLINE)
+  ) {
+      strncpy(dst+dstpos,"<u>",dstsize - dstpos-1); // TODO : not efficient
+      dstpos+=3;
+    }
+    else if(
+      (src[srcpos] == 0 && attrs[srcpos-1] == A_UNDERLINE) ||
+      (src[srcpos] != 0 && attrs[srcpos-1] == A_UNDERLINE && attrs[srcpos] != A_UNDERLINE)
+  ) {
+      strncpy(dst+dstpos,"</u>",dstsize - dstpos-1); // TODO : not efficient
+      dstpos+=4;
+    }
+    dst[dstpos] = src[srcpos];
+    dstpos++;
+    srcpos++;
+    if(!src[srcpos]) break;
+  }
+
+  dst[dstpos] = 0;
+
   return 0;
 }
 

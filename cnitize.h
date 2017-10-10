@@ -11,7 +11,14 @@ int tohtml(
 
 /* PUBLIC INTERFACE */
 
-/** Sanitize a user-provided string with basic formatting (b, i, u, s, tt tags)
+/* Attributes */
+#define A_BOLD 1
+#define A_ITALIC 2
+#define A_UNDERLINE 4
+#define A_STRIKE 8
+#define A_TAG 16
+
+/** Sanitize a user-provided string with basic formatting (b, i, u, s tags)
  so it can be inserted in an HTML document without (hopefully) any security
  risks nor breaking the document layout or formatting.
 
