@@ -3,3 +3,21 @@ blah$blah
 <blah>$&lt;blah&gt;
 notunderline<u>underline</u>notunderline2$notunderline<u>underline</u>notunderline2
 <u>underline</u>$<u>underline</u>
+
+# Tests from http://moul.es/slip-tester
+message de base$message de base
+<i>tags <b>imbriqués</b> correctement</i>$<i>tags <b>imbriqués</b> correctement</i>
+<i>tags <b>qui</i> se</b> chevauchent$TODO
+<i>italique</i> <b>gras</b> <u>souligné</u> <s>barré</s>$<i>italique</i> <b>gras</b> <u>souligné</u> <s>barré</s>
+<m>Moment</m>$&lt;m&gt;Moment&lt;/m&gt;
+<tt>teletype</tt>$&lt;tt&gt;teletype&lt;/tt&gt;
+<code>avec des <i>balises</i></code>$&lt;code&gt;avec des <i>balises</i>&lt;/code&gt;
+tags <b></b> inutiles$tags inutiles
+tags avec des attributs <b class="test"></b>$tags avec des attributs &lt;b class=&quot;test&quot;&gt;&lt;/b&gt;
+entités HTML : &gt; &lt; &quot; &amp; &nbsp;$TODO
+caractères de contrôle : \x08 (backspace) \x1B (escape)$TODO
+unicode à la con : 🐧 (manchot, 4 octets) 👩‍👩‍👧‍👦 (deux femmes, une fille, et un garçon, en 7 glyphes et 25 octets)$unicode à la con : 🐧 (manchot, 4 octets) 👩‍👩‍👧‍👦 (deux femmes, une fille, et un garçon, en 7 glyphes et 25 octets)
+URL : http://example.com$<a href="http://example.com">[url]</a>
+URL avec des espaces : http://example.com/chemin%20avec%20des%20espaces?param=des+espaces$URL avec des espaces : <a href="http://example.com/chemin%20avec%20des%20espaces?param=des+espaces">[url]</a>
+URL (dans une parenthèse http://example.com)$URL (dans une parenthèse <a href="http://example.com">[url]</a>)
+URL suivie d\'une virgule http://example.com, comme ça$URL suivie d'une virgule <a href="http://example.com">[url]</a>, comme ça
