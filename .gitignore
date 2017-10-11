@@ -1,5 +1,9 @@
-cnitize
+/cnitize
+/cnitize-afl
+
 /tmp
+/afl-in
+/afl-out
 
 # Prerequisites
 *.d
