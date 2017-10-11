@@ -76,6 +76,8 @@ void compact(char * restrict src, char * restrict attrs)
   src[outpos] = 0;
 }
 
+// TODO improve this macro
+#define SAFECOPYTODST(str) strlcpy(dst+dstpos, str, (dstsize-dstpos-1 < 0)?0:(dstsize-dstpos-1))
 int tohtml(
   const char * restrict src,
   const char * restrict attrs,
@@ -91,27 +93,27 @@ int tohtml(
       (srcpos == 0 && attrs[srcpos] == A_UNDERLINE) ||
       (srcpos != 0 && attrs[srcpos] == A_UNDERLINE && attrs[srcpos-1] != A_UNDERLINE)
   ) {
-      strncpy(dst+dstpos,"<u>",dstsize - dstpos-1); // TODO : not efficient
+      SAFECOPYTODST("<u>");
       dstpos+=3;
     }
 
 
     /* 2) copy the characters, applying formatting if needed */
     if ((src[srcpos]>0 && src[srcpos]<32) || src[srcpos]==127)
-      dst[dstpos] = ' ';
+      SAFECOPYTODST(" ");
     else if (src[srcpos] == '&') {
-      strncpy(dst+dstpos,"&amp;",dstsize - dstpos-1);
+      SAFECOPYTODST("&amp;");
       dstpos += 4; // +1 done after the loop
     }
     else if (src[srcpos] == '<') {
-      strncpy(dst+dstpos,"&lt;",dstsize - dstpos-1);
+      SAFECOPYTODST("&lt;");
       dstpos += 3; // +1 done after the loop
     }
     else if (src[srcpos] == '>') {
-      strncpy(dst+dstpos,"&gt;",dstsize - dstpos-1);
+      SAFECOPYTODST("&gt;");
       dstpos += 3; // +1 done after the loop
     }
-    else
+    else if(dstpos<dstsize-2)
       dst[dstpos] = src[srcpos];
 
     dstpos++;
@@ -123,7 +125,7 @@ int tohtml(
       (src[srcpos] == 0 && attrs[srcpos-1] == A_UNDERLINE) ||
       (src[srcpos] != 0 && attrs[srcpos-1] == A_UNDERLINE && attrs[srcpos] != A_UNDERLINE)
   ) {
-      strncpy(dst+dstpos,"</u>",dstsize - dstpos-1); // TODO : not efficient
+      SAFECOPYTODST("</u>");
       dstpos+=4;
     }
   }
