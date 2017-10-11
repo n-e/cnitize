@@ -17,8 +17,10 @@ int main(int argc, char const *argv[]) {
 
   while((srclen = getline(&src, &srccap, stdin))>0) {
     char dest[DESTLEN];
+    if (srclen > 0)
+      src[srclen-1] = 0; // strip the \n at the end before passing it to sanitize
     if (sanitize(src,dest,DESTLEN) == 0)
-      printf("%s",dest);
+      printf("%s\n",dest);
     else
       fprintf(stderr,"Error: output bigger than DESTLEN");
   }
@@ -82,7 +84,9 @@ int tohtml(
 {
   size_t srcpos = 0, dstpos = 0;
 
-  while(dstpos < dstsize-1) { // TODO : check if off by one
+  while(src[srcpos] && dstpos < dstsize-1) { // TODO : check if off by one
+
+    /* 1) Add the start tags if necessary per the attributes */
     if(
       (srcpos == 0 && attrs[srcpos] == A_UNDERLINE) ||
       (srcpos != 0 && attrs[srcpos] == A_UNDERLINE && attrs[srcpos-1] != A_UNDERLINE)
@@ -90,17 +94,38 @@ int tohtml(
       strncpy(dst+dstpos,"<u>",dstsize - dstpos-1); // TODO : not efficient
       dstpos+=3;
     }
-    else if(
+
+
+    /* 2) copy the characters, applying formatting if needed */
+    if ((src[srcpos]>0 && src[srcpos]<32) || src[srcpos]==127)
+      dst[dstpos] = ' ';
+    else if (src[srcpos] == '&') {
+      strncpy(dst+dstpos,"&amp;",dstsize - dstpos-1);
+      dstpos += 4; // +1 done after the loop
+    }
+    else if (src[srcpos] == '<') {
+      strncpy(dst+dstpos,"&lt;",dstsize - dstpos-1);
+      dstpos += 3; // +1 done after the loop
+    }
+    else if (src[srcpos] == '>') {
+      strncpy(dst+dstpos,"&gt;",dstsize - dstpos-1);
+      dstpos += 3; // +1 done after the loop
+    }
+    else
+      dst[dstpos] = src[srcpos];
+
+    dstpos++;
+    srcpos++;
+
+
+    /* 3) Add the closing tags if necessary per the attributes */
+    if(
       (src[srcpos] == 0 && attrs[srcpos-1] == A_UNDERLINE) ||
       (src[srcpos] != 0 && attrs[srcpos-1] == A_UNDERLINE && attrs[srcpos] != A_UNDERLINE)
   ) {
       strncpy(dst+dstpos,"</u>",dstsize - dstpos-1); // TODO : not efficient
       dstpos+=4;
     }
-    dst[dstpos] = src[srcpos];
-    dstpos++;
-    srcpos++;
-    if(!src[srcpos]) break;
   }
 
   dst[dstpos] = 0;
@@ -133,18 +158,18 @@ char starts_with_otag(const char * str)
   if(str[0] == 0 || str[1] == 0 || str[2] == 0 || str[3] == 0)
     return 0;
 
-  char mask1[]="<\0>\0";
+  char mask1[]="<\0>\0"; // TODO : check there is no bug if we only use the comparison expr as a mask
 
   if(((*(int32_t*)str) & (*(int32_t*) mask1)) == (*(int32_t*) mask1)) {
     const char *tag = str+1;
 
-    char tag_idx = 0;
+    char tag_idx = -1;
     for (size_t i = 0; i < A_TAGSSZ; i++) {
       if (*tag == a_tags[i][0])
         tag_idx = i;
     }
 
-    return 1 << tag_idx;
+    return tag_idx == -1 ? 0 : (1 << tag_idx);
   }
 
   return 0;
@@ -161,13 +186,13 @@ char starts_with_ctag(const char * str)
   if(((*(int32_t*)str) & (*(int32_t*) mask1)) == (*(int32_t*) mask1)) {
     const char *tag = str+2;
 
-    char tag_idx = 0;
+    char tag_idx = -1;
     for (size_t i = 0; i < A_TAGSSZ; i++) {
       if (*tag == a_tags[i][0])
         tag_idx = i;
     }
 
-    return 1 << tag_idx;
+    return tag_idx == -1 ? 0 : (1 << tag_idx);
   }
 
   return 0;
