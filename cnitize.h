@@ -8,6 +8,16 @@ int tohtml(
   char * restrict dst,
   size_t dstsize);
 
+/* UTILITY FUNCTIONS */
+
+/* Checks if the string starts with an opening html tag. Allowed tags are
+the ones defined below.
+
+@returns the bitmask of the tag on success, 0 on failure.
+*/
+char starts_with_otag(const char * str);
+char starts_with_ctag(const char * str);
+
 
 /* PUBLIC INTERFACE */
 
@@ -17,6 +27,10 @@ int tohtml(
 #define A_UNDERLINE 4
 #define A_STRIKE 8
 #define A_TAG 16
+
+#define A_TAGSSZ 4
+const char *a_tags[] = {"b","i","u","tt"};
+  /* Note: tags are sorted in ascending bitmask value */
 
 /** Sanitize a user-provided string with basic formatting (b, i, u, s tags)
  so it can be inserted in an HTML document without (hopefully) any security
