@@ -73,7 +73,7 @@ void compact(char * restrict src, char * restrict attrs)
 }
 
 // TODO improve this macro
-#define SAFECOPYTODST(str) strlcpy(dst+dstpos, str, (dstsize-dstpos-1 < 0)?0:(dstsize-dstpos-1))
+#define SAFECOPYTODST(str) strlcpy(dst+dstpos, str, ((int)dstsize-(int)dstpos-1 < 0)?0:(dstsize-dstpos))
 int tohtml(
   const char * restrict src,
   const char * restrict attrs,
@@ -124,8 +124,9 @@ int tohtml(
       SAFECOPYTODST("&gt;");
       dstpos += 3; // +1 done after the loop
     }
-    else if(dstpos<dstsize-2)
+    else if(dstpos<dstsize-2) {
       dst[dstpos] = src[srcpos];
+    }
 
     dstpos++;
     srcpos++;
@@ -165,7 +166,8 @@ int tohtml(
     }
   }
 
-  dst[dstpos] = 0;
+  SAFECOPYTODST("\0");
+  dst[dstsize-1] = 0; /* The last 0 might not be copied if we are too far ahead */
 
   return 0;
 }
