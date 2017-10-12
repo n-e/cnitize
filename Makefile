@@ -1,4 +1,4 @@
-CFLAGS=-Wall -O2
+CFLAGS=-Wall -O3
 
 debug: CFLAGS=-Wall -g
 
