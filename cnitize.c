@@ -11,10 +11,6 @@ int main(int argc, char const *argv[]) {
   size_t srccap = 0;
   ssize_t srclen = 0;
 
-  /* Use line buffering even when not in interactive mode so the sanitized
-  post is returned instantly */
-  setvbuf(stdout, NULL, _IOLBF, BUFSIZ);
-
   while((srclen = getline(&src, &srccap, stdin))>0) {
     char dest[DESTLEN];
     if (srclen > 0)
