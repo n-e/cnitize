@@ -84,13 +84,28 @@ int tohtml(
 
   while(src[srcpos] && dstpos < dstsize-1) { // TODO : check if off by one
 
+
     /* 1) Add the start tags if necessary per the attributes */
-    if(
-      (srcpos == 0 && attrs[srcpos] == A_UNDERLINE) ||
-      (srcpos != 0 && attrs[srcpos] == A_UNDERLINE && attrs[srcpos-1] != A_UNDERLINE)
-  ) {
-      SAFECOPYTODST("<u>");
-      dstpos+=3;
+    // TODO : group with the closing tags code block
+    char prev_attrs = (srcpos == 0) ? 0 : attrs[srcpos-1];
+    char cur_attrs = attrs[srcpos];
+
+    char chged_attrs = prev_attrs ^ cur_attrs;
+    char smallest_changed_attr = -1;
+    for (size_t i = 0; i < A_TAGSSZ; i++) {
+      char attr = 1 << i;
+      if ((attr|chged_attrs) == chged_attrs ) { smallest_changed_attr = attr; break;}
+    }
+
+    for (size_t i = 0; i < A_TAGSSZ; i++) {
+      if (
+        (!((prev_attrs>>i)&1) && ((cur_attrs>>i)&1)) || // what should be opened
+        (((prev_attrs>>i)&1) && (1<<i)>smallest_changed_attr && smallest_changed_attr > 0) // what was closed to be "safe"
+      ) {
+        SAFECOPYTODST("<"); dstpos++;
+        SAFECOPYTODST(a_tags[i]); dstpos++;
+        SAFECOPYTODST(">"); dstpos++;
+      }
     }
 
 
@@ -117,12 +132,36 @@ int tohtml(
 
 
     /* 3) Add the closing tags if necessary per the attributes */
-    if(
+    /* if(
       (src[srcpos] == 0 && attrs[srcpos-1] == A_UNDERLINE) ||
       (src[srcpos] != 0 && attrs[srcpos-1] == A_UNDERLINE && attrs[srcpos] != A_UNDERLINE)
   ) {
       SAFECOPYTODST("</u>");
       dstpos+=4;
+    }
+  } */
+
+    prev_attrs = attrs[srcpos-1];
+    cur_attrs = src[srcpos] ? attrs[srcpos] : 0;
+
+     chged_attrs = prev_attrs ^ cur_attrs;
+     smallest_changed_attr = -1;
+    for (size_t i = 0; i < A_TAGSSZ; i++) {
+      char attr = 1 << i;
+      if ((attr|chged_attrs) == chged_attrs ) { smallest_changed_attr = attr; break;}
+    }
+
+    for (int i = A_TAGSSZ - 1; i >= 0; i--) {
+      char was_closed = 0;
+      if (
+        ((prev_attrs>>i)&1 && !((cur_attrs>>i)&1)) || // Attr goes from set to unset
+        (((prev_attrs>>i)&1) && (1<<i)>smallest_changed_attr && smallest_changed_attr > 0)// Attr was set and comes before the last switching attr
+      ) { // TODO : there is a buffer overrun somewhere if the condition is always false
+        SAFECOPYTODST("</"); dstpos+=2;
+        SAFECOPYTODST(a_tags[i]); dstpos++;
+        SAFECOPYTODST(">"); dstpos++;
+        was_closed = 1;
+      }
     }
   }
 

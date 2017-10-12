@@ -29,7 +29,7 @@ char starts_with_ctag(const char * str);
 #define A_TAG 16
 
 #define A_TAGSSZ 4
-const char *a_tags[] = {"b","i","u","tt"};
+const char *a_tags[] = {"b","i","u","s"};
   /* Note: tags are sorted in ascending bitmask value */
 
 /** Sanitize a user-provided string with basic formatting (b, i, u, s tags)
