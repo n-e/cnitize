@@ -73,7 +73,7 @@ void compact(char * restrict src, char * restrict attrs)
 }
 
 // TODO improve this macro
-#define SAFECOPYTODST(str) strlcpy(dst+dstpos, str, ((int)dstsize-(int)dstpos-1 < 0)?0:(dstsize-dstpos))
+#define SAFECOPYTODST(str) stpncpy(dst+dstpos, str, ((int)dstsize-(int)dstpos-1 < 0)?0:(dstsize-dstpos))
 int tohtml(
   const char * restrict src,
   const char * restrict attrs,
