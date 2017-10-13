@@ -27,6 +27,7 @@ char starts_with_ctag(const char * str);
 #define A_UNDERLINE 4
 #define A_STRIKE 8
 #define A_TAG 16
+#define A_URL 32
 
 #define A_TAGSSZ 4
 const char *a_tags[] = {"b","i","u","s"};

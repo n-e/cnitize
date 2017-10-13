@@ -51,6 +51,11 @@ void parse(const char * restrict src, char * restrict attrs) {
       mask &= ~tag;
     }
     else {
+      if (!strncmp(src+i,"http://",7))
+        mask |= A_URL;
+      if (src[i] == ' '||src[i] == ','||src[i] == ')'||src[i] == '['||src[i] == '"')
+        mask &= ~A_URL;
+
       attrs[i] = mask;
     }
   }
@@ -108,8 +113,13 @@ int tohtml(
       }
     }
 
+    /* 2) add the url opening and closing tags */
+    if (!(prev_attrs&A_URL) && (cur_attrs&A_URL)) {
+      SAFECOPYTODST("<a href=\""); dstpos += 9;
+    }
 
-    /* 2) copy the characters, applying formatting if needed */
+
+    /* 3) copy the characters, applying formatting if needed */
     if ((src[srcpos]>0 && src[srcpos]<32) || src[srcpos]==127)
       SAFECOPYTODST(" ");
     else if (src[srcpos] == '&') {
@@ -124,6 +134,11 @@ int tohtml(
       SAFECOPYTODST("&gt;");
       dstpos += 3; // +1 done after the loop
     }
+    /* Unnecessary since we exclude quotes from url attributes */
+    /*else if (src[srcpos] == '"' && (cur_attrs&A_URL)) {
+      SAFECOPYTODST("&quot;");
+      dstpos += 5; // +1 done after the loop
+    } */
     else if(dstpos<dstsize-2) {
       dst[dstpos] = src[srcpos];
     }
@@ -132,18 +147,14 @@ int tohtml(
     srcpos++;
 
 
-    /* 3) Add the closing tags if necessary per the attributes */
-    /* if(
-      (src[srcpos] == 0 && attrs[srcpos-1] == A_UNDERLINE) ||
-      (src[srcpos] != 0 && attrs[srcpos-1] == A_UNDERLINE && attrs[srcpos] != A_UNDERLINE)
-  ) {
-      SAFECOPYTODST("</u>");
-      dstpos+=4;
-    }
-  } */
-
+    /* 4) Add the closing tags if necessary per the attributes */
     prev_attrs = attrs[srcpos-1];
     cur_attrs = src[srcpos] ? attrs[srcpos] : 0;
+
+    // this is moved here to work if the input ends with the url end
+    if ((prev_attrs&A_URL) && !(cur_attrs&A_URL)) {
+      SAFECOPYTODST("\">[url]</a>"); dstpos += 11;
+    }
 
      chged_attrs = prev_attrs ^ cur_attrs;
      smallest_changed_attr = -1;

@@ -4,7 +4,7 @@ blah$blah
 notunderline<u>underline</u>notunderline2$notunderline<u>underline</u>notunderline2
 <u>underline</u>$<u>underline</u>
 
-# Tests from http://moul.es/slip-tester
+# Tests from moul.es/slip-tester
 message de base$message de base
 <i>tags <b>imbriqués</b> correctement</i>$<i>tags </i><b><i>imbriqués</i></b><i> correctement</i>
 <b>tags <i>imbriqués</i> correctement bis</b>$<b>tags <i>imbriqués</i> correctement bis</b>
@@ -22,9 +22,9 @@ entités HTML : &gt; &lt; &quot; &amp; &nbsp;$entités HTML : &amp;gt; &amp;lt; 
 unicode à la con : 🐧 (manchot, 4 octets) 👩‍👩‍👧‍👦 (deux femmes, une fille, et un garçon, en 7 glyphes et 25 octets)$unicode à la con : 🐧 (manchot, 4 octets) 👩‍👩‍👧‍👦 (deux femmes, une fille, et un garçon, en 7 glyphes et 25 octets)
 Horloges : 14:00 14:00:00 14:00:00²$Horloges : 14:00 14:00:00 14:00:00²
 Totoz : [:totoz] [:velasquez:5]$Totoz : [:totoz] [:velasquez:5]
-URL : http://example.com$<a href="http://example.com">[url]</a>
+URL : http://example.com$URL : <a href="http://example.com">[url]</a>
 URL avec des espaces : http://example.com/chemin%20avec%20des%20espaces?param=des+espaces$URL avec des espaces : <a href="http://example.com/chemin%20avec%20des%20espaces?param=des+espaces">[url]</a>
 URL (dans une parenthèse http://example.com)$URL (dans une parenthèse <a href="http://example.com">[url]</a>)
-URL suivie d\'une virgule http://example.com, comme ça$URL suivie d'une virgule <a href="http://example.com">[url]</a>, comme ça
-URL suivie d'un totoz http://example.com[:totoz]
-URL avec un numéro de port http://example.com:80/chemin
+URL suivie d'une virgule http://example.com, comme ça$URL suivie d'une virgule <a href="http://example.com">[url]</a>, comme ça
+URL suivie d'un totoz http://example.com[:totoz]$URL suivie d'un totoz <a href="http://example.com">[url]</a>[:totoz]
+URL avec un numéro de port http://example.com:80/chemin$URL avec un numéro de port <a href="http://example.com:80/chemin">[url]</a>
