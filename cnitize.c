@@ -11,17 +11,26 @@ int main(int argc, char const *argv[]) {
   size_t srccap = 0;
   ssize_t srclen = 0;
 
+  char *attrs = malloc(1024);
+  size_t attrlen = 1024;
+
   while((srclen = getline(&src, &srccap, stdin))>0) {
     char dest[DESTLEN];
     if (srclen > 0)
-      src[srclen-1] = 0; // strip the \n at the end before passing it to sanitize
-    if (sanitize(src,dest,DESTLEN) == 0)
+      src[--srclen] = 0; // strip the \n at the end before passing it to sanitize
+
+    if (srclen > attrlen) {
+      attrs = realloc(attrs, srclen);
+      attrlen = srclen;
+    }
+    if (sanitize_fast(src,dest,srclen-1,DESTLEN,attrs) == 0)
       printf("%s\n",dest);
     else
       fprintf(stderr,"Error: output bigger than DESTLEN");
   }
 
   free(src);
+  free(attrs);
 
   return 0;
 }
@@ -199,6 +208,17 @@ int sanitize(const char * restrict src, char * restrict dst, size_t dstsize)
 
   return ret;
 }
+
+
+int sanitize_fast(char * restrict src, char * restrict dst, size_t srcsize, size_t dstsize, char * restrict attrs)
+{
+  parse(src,attrs);
+  compact(src,attrs);
+  int ret = tohtml(src,attrs,dst,dstsize);
+
+  return ret;
+}
+
 
 /* UTILITY FUNCTIONS */
 

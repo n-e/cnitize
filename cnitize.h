@@ -52,3 +52,13 @@ const char *a_tags[] = {"b","i","u","s"};
  discarded as it may contain unmatched tags.
 */
 int sanitize(const char * restrict src, char * restrict dst, size_t dstsize);
+
+/** Same as sanitize, except :
+- src is replaced with its compacted version
+- srcsize must be passed
+- a buffer attrs of the same size as src must be provided. It is filled with the attributes
+
+It doesn't do any memory allocations, but despite that ant its name doesn't appear
+to be faster than sanitize.
+*/
+int sanitize_fast(char * restrict src, char * restrict dst, size_t srcsize, size_t dstsize, char * restrict attrs);
